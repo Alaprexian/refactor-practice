@@ -1,10 +1,13 @@
 import csv
+import numpy as np
 # el programa deberá calcular el ganador de votos validos considerando que los siguientes datos son proporcionados:
 # region,provincia,distrito,dni,candidato,esvalido
 # Si hay un candidato con >50% de votos válidos retornar un array con un string con el nombre del ganador
 # Si no hay un candidato que cumpla la condicion anterior, retornar un array con los dos candidatos que pasan a segunda vuelta
 # Si ambos empatan con 50% de los votos se retorna el que apareció primero en el archivo
 # el DNI debe ser valido (8 digitos)
+
+        
 class CalculaGanador:
 
     def leerdatos(self):
@@ -15,20 +18,64 @@ class CalculaGanador:
             for fila in datareader:
                 data.append( fila)
         return data
+    
+    
+            
 
     def calcularganador(self, data):
         votosxcandidato = {}
+        cant=0
         for fila in data:
-            if not fila[4] in votosxcandidato:
-                votosxcandidato[fila[4]] = [fila[4], 0]
-            if fila[5] == '1':
-                votosxcandidato[fila[4]][1] = votosxcandidato[fila[4]][1] + 1
-        ordenado = sorted(votosxcandidato.items(), key=lambda item:item[1][1], reverse=True)
+            if dni_valido(fila[3]):
+                nombre_candidato=fila[4] #Se le asigna una variable para saber que referencia la fila 4 
+                valido=fila[5] #Se le asigna una variable para saber que referencia la fila 5
+                cant=cant+1
+                if not nombre_candidato in votosxcandidato:
+                    votosxcandidato[nombre_candidato] = [nombre_candidato, 0]
+                if valido == '1':
+                    votosxcandidato[nombre_candidato][1] = votosxcandidato[nombre_candidato][1] + 1
+        mostrar_candidatosxvotos(votosxcandidato) #Extraccion de metodos
+        return print_ordenado(votosxcandidato) #Extraccion de metodos
+
+def mostrar_candidatosxvotos(votosxcandidato): #muestra cada candidato con sus respectivos votos
         for candidato in votosxcandidato:
             print('candidato: ' + candidato + ' votos validos: ' + str(votosxcandidato[candidato]))
-        for candidato in ordenado:
-            return [candidato]
 
+def print_ordenado(votosxcandidato): #Muestra el primer candidato de la lista ordenada, el que tiene mas votos
+    ordenado = sorted(votosxcandidato.items(), key=lambda item:item[1][1], reverse=True)
+    for candidato in ordenado:
+        return [candidato]
+
+def dni_valido(dni):
+    if len(dni) == 8:
+        return True
+    return False
+
+
+def Prueba_uni1(): #2 candidatos con la misma cantidad de votos
+    datatest = [
+['Áncash', 'Asunción', 'Acochaca', '40810062', 'Eddie Hinesley', '1'],
+['Áncash', 'Asunción', 'Acochaca', '86777322', 'Aundrea Grace', '1'],
+['Áncash', 'Asunción', 'Acochaca', '23017965', 'Aundrea Grace', '1'],
+['Áncash', 'Asunción', 'Acochaca', '57533597', 'Eddie Hinesley', '1']
+]            
+    print('Prueba unitaria 1: Empate de candidatos')
+    c=CalculaGanador()
+    print(c.calcularganador(datatest))
+
+def Pruebauni2(): #Se ingresa un dni invalido
+    datatest = [
+['Áncash', 'Asunción', 'Acochaca', '40810062', 'Eddie Hinesley', '0'],
+['Áncash', 'Asunción', 'Acochaca', '8677732', 'Aundrea Grace', '1'],
+['Áncash', 'Asunción', 'Acochaca', '2301796', 'Aundrea Grace', '1'],
+['Áncash', 'Asunción', 'Acochaca', '57533597', 'Eddie Hinesley', '1']
+]            
+    print('Prueba unitaria 2: Dni invalido')
+    c=CalculaGanador()
+    print(c.calcularganador(datatest))
+
+
+""""
 c = CalculaGanador()
 print(c.calcularganador(c.leerdatos()))
 datatest = [
@@ -38,3 +85,10 @@ datatest = [
 ['Áncash', 'Asunción', 'Acochaca', '23017965', 'Aundrea Grace', '1']
 ]
 print(c.calcularganador(datatest))
+exit()
+"""
+
+Prueba_uni1()
+print()
+Pruebauni2()
+exit()
